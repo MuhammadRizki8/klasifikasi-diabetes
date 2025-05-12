@@ -57,7 +57,9 @@ Dataset ini berisi data medis dari 768 wanita dari populasi asli Amerika (Pima I
 | Age                      | Usia (tahun) |
 | Outcome                  | Target: 1 = diabetes, 0 = tidak |
 
-### 📈 Distribusi Kelas Target (Visualisasi dapat dilihat pada notebook)
+### 📈 Distribusi Kelas Target 
+![image](https://github.com/user-attachments/assets/66b6bfb9-52f4-4f7e-9e9b-91584691cc00)
+
 - Kelas 0 (Tidak diabetes): 500 sampel (65.1%)
 - Kelas 1 (Diabetes): 268 sampel (34.9%)
 
@@ -71,30 +73,71 @@ Dataset ini berisi data medis dari 768 wanita dari populasi asli Amerika (Pima I
 | Insulin       | 374         |
 | BMI           | 11          |
 
-### Korelasi antar Variabel (Visualisasi dapat dilihat pada notebook)
+### Korelasi antar Variabel 
+![image](https://github.com/user-attachments/assets/ad42403b-eff5-4229-961f-37055790f1e1)
+![image](https://github.com/user-attachments/assets/b5aa4433-a1f0-490c-8b6b-ffa3e80f8de7)
+
 Analisis korelasi menunjukkan bahwa beberapa fitur memiliki korelasi yang signifikan dengan status diabetes (*Outcome*):
 - **Glucose** memiliki korelasi positif tertinggi dengan diabetes, yang sesuai dengan pengetahuan medis.
 - **BMI** dan **Age** juga menunjukkan korelasi positif yang cukup kuat.
 - **DiabetesPedigreeFunction**, yang mencerminkan riwayat keluarga, juga berkorelasi dengan status diabetes.
+
+beberapa insight yang dapat kita peroleh:
+
+1. **Distribusi Kelas**: Dataset tidak seimbang, dengan lebih banyak kasus non-diabetes (kelas 0) dibandingkan
+   kasus diabetes (kelas 1). Hal ini perlu diperhatikan dalam pemodelan.
+
+2. **Glukosa dan Outcome**: Terdapat korelasi positif yang kuat antara kadar glukosa dan diabetes,
+   yang sesuai dengan pengetahuan medis bahwa kadar glukosa tinggi merupakan indikator utama diabetes.
+
+3. **BMI dan Diabetes**: BMI juga menunjukkan korelasi yang cukup dengan outcome diabetes,
+   mengkonfirmasi bahwa obesitas merupakan faktor risiko diabetes.
+
+4. **Usia**: Pasien yang lebih tua cenderung memiliki risiko diabetes lebih tinggi, ditunjukkan dengan
+   korelasi positif antara usia dan outcome.
+
+5. **Kehamilan**: Jumlah kehamilan memiliki korelasi positif dengan diabetes, menunjukkan bahwa
+   wanita dengan lebih banyak riwayat kehamilan mungkin memiliki risiko lebih tinggi.
+
+6. **Outliers**: Terdapat outlier di beberapa fitur seperti Insulin dan SkinThickness yang perlu ditangani
+   dalam tahap pra-pemrosesan data.
 
 ---
 ## 🧹 Data Preparation
 Beberapa teknik persiapan data yang diterapkan dalam proyek ini:
 
 ### 1. Penanganan Nilai yang Tidak Valid
-Nilai nol pada fitur klinis (*Glucose*, *BloodPressure*, *SkinThickness*, *Insulin*, *BMI*) yang secara medis tidak mungkin bernilai nol ditangani dengan mengganti nilai tersebut dengan nilai median dari kelompok yang sama berdasarkan status diabetes (*Outcome*). Pendekatan ini lebih baik daripada mengganti dengan median keseluruhan karena mempertahankan karakteristik distribusi dari masing-masing kelompok.
+
+Nilai nol pada fitur klinis seperti *Glucose*, *BloodPressure*, *SkinThickness*, *Insulin*, dan *BMI* dianggap tidak valid secara medis karena fitur-fitur ini tidak seharusnya bernilai nol pada manusia yang hidup.
+
+Nilai-nilai nol tersebut diganti dengan nilai median dari masing-masing kelompok berdasarkan status diabetes (*Outcome*) untuk menjaga konsistensi distribusi data antar kelas.
+
+> Pendekatan ini lebih baik daripada mengganti dengan median keseluruhan karena mempertahankan karakteristik distribusi dari masing-masing kelompok, sehingga hasil pelatihan model tidak bias terhadap kelompok tertentu.
 
 ### 2. Pembagian Data
-Data dibagi menjadi data training (80%) dan data testing (20%) dengan stratifikasi berdasarkan variabel target (*Outcome*) untuk memastikan proporsi kelas yang seimbang pada kedua subset data.
+
+Data dibagi menjadi data training (80%) dan data testing (20%) dengan menggunakan teknik stratifikasi berdasarkan variabel target (*Outcome*).
+
+> Stratifikasi memastikan bahwa proporsi antara kelas positif dan negatif tetap seimbang di kedua subset data, yang penting untuk menjaga performa model terutama pada data yang memiliki ketidakseimbangan kelas.
 
 ### 3. Standarisasi Data
 
-Standarisasi dilakukan menggunakan _StandardScaler_ untuk memastikan semua fitur memiliki skala yang seragam, yaitu distribusi dengan rata-rata 0 dan standar deviasi 1. Hal ini sangat penting terutama untuk algoritma seperti _Logistic Regression_ dan _SVM_ yang sensitif terhadap skala data.
+Standarisasi dilakukan terhadap semua fitur numerik menggunakan _StandardScaler_, yang mengubah distribusi data agar memiliki rata-rata 0 dan standar deviasi 1.
+
+> Ini penting karena beberapa algoritma pembelajaran mesin seperti *Logistic Regression* dan *SVM* sangat sensitif terhadap skala fitur, sehingga standarisasi membantu model dalam melakukan optimasi dengan lebih efektif.
 
 ### 4. Penanganan Ketidakseimbangan Kelas dengan SMOTE
-Teknik **SMOTE (Synthetic Minority Over-sampling Technique)** diterapkan untuk mengatasi ketidakseimbangan kelas dalam data training. SMOTE membuat sampel sintetis dari kelas minoritas (diabetes) sehingga jumlahnya seimbang dengan kelas mayoritas.
 
+Ketidakseimbangan jumlah sampel antara kelas diabetes dan non-diabetes pada data training diatasi dengan menggunakan teknik **SMOTE (Synthetic Minority Over-sampling Technique)**.
+
+> SMOTE menghasilkan sampel sintetis baru dari kelas minoritas dengan cara interpolasi terhadap tetangga terdekat, sehingga menghindari duplikasi langsung dan memperkaya variasi data. Hal ini meningkatkan kemampuan model dalam mendeteksi kelas minoritas secara adil.
+```python
+# Menerapkan SMOTE pada data training
+smote = SMOTE(random_state=42)
+```
+X_train_smote, y_train_smote = smote.fit_resample(X_train_scaled, y_train)
 Setelah penerapan SMOTE, distribusi kelas menjadi seimbang:
+![image](https://github.com/user-attachments/assets/329f7abc-7d23-43a6-adf7-d475d2bfdb60)
 
 - **Kelas 0 (Tidak diabetes)**: 400 sampel  
 - **Kelas 1 (Diabetes)**: 400 sampel
@@ -172,6 +215,31 @@ Dalam proyek ini, lima algoritma klasifikasi berbeda dibandingkan untuk menemuka
 - Memerlukan waktu pelatihan yang lama
 - Parameter tuning lebih kompleks
 
+#### Definisi Model
+
+Setiap model didefinisikan dengan parameter dasar sebagai berikut:
+
+- **Logistic Regression**: `max_iter=1000`, `random_state=42`  
+  (Parameter `max_iter` ditingkatkan untuk memastikan konvergensi)
+  
+- **Decision Tree**: `random_state=42`  
+  (Digunakan untuk menghindari hasil yang acak antar eksekusi)
+
+- **Random Forest**: `random_state=42`  
+  (Secara default menggunakan 100 pohon dan pembobotan fitur secara acak)
+
+- **SVM**: `probability=True`, `random_state=42`  
+  (`probability=True` digunakan untuk menghasilkan probabilitas prediksi, yang berguna untuk evaluasi lebih lanjut)
+
+- **Gradient Boosting**: `random_state=42`  
+  (Digunakan default setting dengan booster berbasis pohon)
+
+#### Evaluasi Model
+
+Setiap model dievaluasi menggunakan **5-Fold Cross-Validation** dengan metrik **accuracy**. Teknik ini membagi data training menjadi lima bagian, melatih model pada empat bagian, dan mengujinya pada satu bagian, lalu mengulang proses tersebut lima kali untuk menghasilkan skor yang lebih stabil dan representatif.
+
+> Cross-validation penting untuk mengukur kinerja model secara lebih objektif dan menghindari overfitting terhadap data training.
+
 
 #### Hasil Evaluasi Awal (Cross-Validation 5-Fold)
 
@@ -244,7 +312,30 @@ Beberapa metrik evaluasi digunakan untuk mengukur performa model:
 
 
 ### Hasil Evaluasi
+Setelah mendefinisikan lima model klasifikasi, dilakukan evaluasi menggunakan **5-fold cross-validation** pada data hasil SMOTE. Hasil rata-rata akurasi (mean accuracy) dan standar deviasi dari setiap model adalah sebagai berikut:
 
+| Model                | Mean CV Accuracy | Std Dev |
+|----------------------|------------------|---------|
+| Logistic Regression  | 0.7862           | ± 0.0214 |
+| Decision Tree        | 0.8562           | ± 0.0198 |
+| Random Forest        | **0.9000**       | ± 0.0240 |
+| SVM                  | 0.8712           | ± 0.0085 |
+| Gradient Boosting    | 0.8812           | ± 0.0230 |
+
+Dari hasil tersebut, **Random Forest** menunjukkan performa terbaik sebelum dilakukan tuning hyperparameter.
+### Hyperparameter Tuning dengan Grid Search
+
+Berdasarkan hasil evaluasi awal, **Random Forest** dipilih sebagai kandidat model terbaik. Untuk meningkatkan performanya, dilakukan **Grid Search** menggunakan kombinasi parameter berikut:
+
+- `n_estimators`: [100, 200, 300]
+- `max_depth`: [None, 10, 20, 30]
+- `min_samples_split`: [2, 5, 10]
+- `min_samples_leaf`: [1, 2, 4]
+
+Hasil terbaik dari tuning adalah:
+
+- **Best Parameters**: `{'max_depth': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}`
+- **Best CV Accuracy**: `0.9037`
 Hasil evaluasi model **Random Forest terbaik** pada data testing:
 
 - **Accuracy**: 0.8571  
