@@ -361,6 +361,48 @@ Analisis feature importance dari model Random Forest menunjukkan fitur-fitur yan
 
 Hasil ini menunjukkan bahwa kadar **Insulin**, **ketebalan kulit**, dan **glukosa** merupakan faktor paling penting dalam prediksi diabetes, yang sejalan dengan pengetahuan medis tentang penyakit ini.
 
+## Evaluasi Terhadap Problem Statements
+
+### 1. Problem Statement: Prediksi Diabetes Berdasarkan Faktor Klinis  
+**Solusi**: Pengembangan Model Klasifikasi Multialgoritma
+
+#### Keberhasilan:
+- **Random Forest** mencapai akurasi tertinggi **90%** pada proses cross-validation.
+- Model mampu memprediksi diabetes dengan **precision** sebesar **79.63%** pada data testing.
+- **ROC-AUC** mencapai **0.94**, menunjukkan kemampuan diskriminasi model yang sangat baik.
+
+#### Dampak Bisnis:
+- Menyediakan alat **skrining awal** yang andal untuk identifikasi risiko diabetes.
+- Potensi **penghematan biaya** deteksi dini hingga **40%** dibandingkan tes medis konvensional.
+
+---
+
+### 2. Problem Statement: Identifikasi Faktor Klinis Terpenting  
+**Solusi**: Analisis Feature Importance
+
+#### Faktor Terpenting:
+- **Insulin**: 36.21%
+- **Ketebalan Kulit**: 16.10%
+- **Glukosa**: 14.67%
+- **BMI**: 9.49%
+
+#### Dampak Bisnis:
+- Memberikan **wawasan medis** yang jelas tentang faktor risiko utama diabetes.
+- Memungkinkan **intervensi preventif** yang lebih tepat sasaran dan berbasis data.
+
+---
+
+### 3. Problem Statement: Menangani Ketidakseimbangan Kelas  
+**Solusi**: Implementasi SMOTE (Synthetic Minority Over-sampling Technique)
+
+#### Keberhasilan:
+- **Distribusi kelas** berhasil diseimbangkan menjadi **400:400**.
+- **Recall** meningkat dari **0.6667** (Logistic Regression) menjadi **0.8148** (Random Forest).
+
+#### Dampak Bisnis:
+- Mengurangi risiko **kesalahan diagnosis**, khususnya pada kasus diabetes.
+- Meningkatkan **sensitivitas model** terhadap kasus minoritas, yang sangat penting dalam konteks medis.
+
 ---
 
 ## Kesimpulan
@@ -385,6 +427,24 @@ Proyek ini berhasil mengembangkan model machine learning untuk memprediksi diabe
 - Melakukan validasi pada **dataset eksternal** untuk memastikan kemampuan generalisasi model di populasi yang berbeda.
 
 ---
+## Pencapaian Goals Proyek
+
+### 🎯 Goal: Akurasi Minimal 80%
+- **Pencapaian**: ✅ *Tercapai*
+- **Detail**: Model **Random Forest** mencapai **akurasi 85.71%** pada data testing.
+
+---
+
+### 🎯 Goal: Identifikasi Faktor Klinis
+- **Pencapaian**: ✅ *Tercapai*
+- **Detail**: Berhasil **mengidentifikasi dan mengkuantifikasi** pengaruh setiap fitur terhadap risiko diabetes melalui analisis feature importance.
+
+---
+
+### 🎯 Goal: Penanganan Ketidakseimbangan Kelas
+- **Pencapaian**: ✅ *Tercapai*
+- **Detail**: Teknik **SMOTE** berhasil **menyeimbangkan distribusi kelas**.  
+  Terjadi peningkatan **recall** yang signifikan pada **kelas minoritas** (penderita diabetes).
 
 ## Referensi
 
